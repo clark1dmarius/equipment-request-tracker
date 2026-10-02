@@ -1,5 +1,7 @@
 export const STORAGE_KEY = "mis4173-equipment-requests";
 
+const PRIORITIES = ["Low", "Normal", "High"];
+
 export class RequestValidationError extends Error {
   constructor(errors) {
     super("The equipment request is incomplete.");
@@ -14,12 +16,14 @@ function clean(value) {
 
 export function validateRequest(input = {}) {
   const errors = {};
+  const priority = clean(input.priority);
 
   if (!clean(input.requester)) errors.requester = "Enter the requester name.";
   if (!clean(input.department)) errors.department = "Select a department.";
   if (!clean(input.equipment)) errors.equipment = "Enter the equipment needed.";
   if (!clean(input.neededBy)) errors.neededBy = "Select the date needed.";
   if (!clean(input.reason)) errors.reason = "Enter a business reason.";
+  if (priority && !PRIORITIES.includes(priority)) errors.priority = "Select a valid priority.";
 
   return errors;
 }
@@ -42,6 +46,7 @@ export function createRequest(input, options = {}) {
     requester: clean(input.requester),
     department: clean(input.department),
     equipment: clean(input.equipment),
+    priority: clean(input.priority) || "Normal",
     neededBy: clean(input.neededBy),
     reason: clean(input.reason),
     createdAt: now.toISOString(),
@@ -79,6 +84,7 @@ function isRequestRecord(value) {
     typeof value.requester === "string" &&
     typeof value.department === "string" &&
     typeof value.equipment === "string" &&
+    (value.priority === undefined || PRIORITIES.includes(value.priority)) &&
     typeof value.neededBy === "string" &&
     typeof value.reason === "string" &&
     typeof value.createdAt === "string"
