@@ -2,6 +2,7 @@ import {
   RequestValidationError,
   appendRequest,
   createRequest,
+  filterRequestsByPriority,
   loadRequests,
   saveRequests,
 } from "./request-store.js";
@@ -11,6 +12,9 @@ const message = document.querySelector("#form-message");
 const neededByInput = document.querySelector("#needed-by");
 const count = document.querySelector("#request-count");
 const emptyState = document.querySelector("#empty-state");
+const emptyStateTitle = document.querySelector("#empty-state-title");
+const emptyStateMessage = document.querySelector("#empty-state-message");
+const priorityFilter = document.querySelector("#priority-filter");
 const tableWrapper = document.querySelector("#request-table-wrapper");
 const tableBody = document.querySelector("#request-table-body");
 
@@ -18,6 +22,8 @@ let requests = loadRequests();
 
 neededByInput.min = new Date().toISOString().slice(0, 10);
 renderRequests();
+
+priorityFilter.addEventListener("change", renderRequests);
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -48,11 +54,29 @@ form.addEventListener("submit", (event) => {
 });
 
 function renderRequests() {
+  const selectedPriority = priorityFilter.value;
+  const visibleRequests = filterRequestsByPriority(requests, selectedPriority);
   const hasRequests = requests.length > 0;
-  count.textContent = `${requests.length} ${requests.length === 1 ? "request" : "requests"}`;
-  emptyState.hidden = hasRequests;
-  tableWrapper.hidden = !hasRequests;
-  tableBody.replaceChildren(...requests.map(createRequestRow));
+  const hasVisibleRequests = visibleRequests.length > 0;
+
+  if (selectedPriority === "All") {
+    count.textContent = `${requests.length} ${requests.length === 1 ? "request" : "requests"}`;
+  } else {
+    count.textContent = `${visibleRequests.length} of ${requests.length} requests`;
+  }
+
+  emptyState.hidden = hasVisibleRequests;
+  tableWrapper.hidden = !hasVisibleRequests;
+
+  if (!hasRequests) {
+    emptyStateTitle.textContent = "No requests yet";
+    emptyStateMessage.textContent = "Add the first equipment request using the form.";
+  } else if (!hasVisibleRequests) {
+    emptyStateTitle.textContent = "No matching requests";
+    emptyStateMessage.textContent = `No ${selectedPriority.toLowerCase()} priority requests are currently available.`;
+  }
+
+  tableBody.replaceChildren(...visibleRequests.map(createRequestRow));
 }
 
 function createRequestRow(request) {
