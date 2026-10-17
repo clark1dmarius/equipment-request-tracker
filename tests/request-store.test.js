@@ -6,6 +6,7 @@ import {
   STORAGE_KEY,
   appendRequest,
   createRequest,
+  filterRequestsByPriority,
   loadRequests,
   saveRequests,
 } from "../src/request-store.js";
@@ -85,6 +86,43 @@ test("appendRequest returns a new list with the newest request first", () => {
 
   assert.deepEqual(result.map((request) => request.id), ["new", "old"]);
   assert.deepEqual(original.map((request) => request.id), ["old"]);
+});
+
+test("filterRequestsByPriority returns only matching priorities", () => {
+  const requests = [
+    { id: "high", priority: "High" },
+    { id: "normal", priority: "Normal" },
+    { id: "low", priority: "Low" },
+    { id: "legacy" },
+  ];
+
+  assert.deepEqual(
+    filterRequestsByPriority(requests, "High").map((request) => request.id),
+    ["high"],
+  );
+  assert.deepEqual(
+    filterRequestsByPriority(requests, "Normal").map((request) => request.id),
+    ["normal"],
+  );
+  assert.deepEqual(
+    filterRequestsByPriority(requests, "Low").map((request) => request.id),
+    ["low"],
+  );
+});
+
+test("filterRequestsByPriority preserves all requests and order for All", () => {
+  const requests = [
+    { id: "newest", priority: "High" },
+    { id: "legacy" },
+    { id: "oldest", priority: "Low" },
+  ];
+  const original = structuredClone(requests);
+
+  const result = filterRequestsByPriority(requests, "All");
+
+  assert.deepEqual(result, original);
+  assert.notStrictEqual(result, requests);
+  assert.deepEqual(requests, original);
 });
 
 test("saveRequests and loadRequests round-trip valid records", () => {

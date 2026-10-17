@@ -57,6 +57,12 @@ export function appendRequest(requests, request) {
   return [request, ...requests];
 }
 
+export function filterRequestsByPriority(requests, priority = "All") {
+  if (priority === "All") return [...requests];
+  if (!PRIORITIES.includes(priority)) return [...requests];
+  return requests.filter((request) => request.priority === priority);
+}
+
 export function loadRequests(storage = globalThis.localStorage) {
   if (!storage) return [];
 

@@ -198,6 +198,17 @@ button:hover {
   gap: 1rem;
 }
 
+.list-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.priority-filter-field {
+  width: min(240px, 100%);
+  margin-bottom: 0;
+}
+
 .request-count {
   flex: 0 0 auto;
   margin-bottom: 0;
@@ -306,6 +317,14 @@ tbody tr:hover {
   .list-heading {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .list-controls {
+    justify-content: stretch;
+  }
+
+  .priority-filter-field {
+    width: 100%;
   }
 
   button {
