@@ -53,19 +53,19 @@ Managers need to quickly narrow the request list to High, Normal, or Low priorit
 - Persisting the selected filter between browser sessions
 - Filtering by fields other than Priority
 
-
 ## Verification Results
 
-- **AC1 — Pass:** Confirmed the default control is **All priorities** and the full request list is rendered on initial load.
-- **AC2 — Pass:** Selecting **High** displays only High-priority requests.
+- **AC1 — Pass:** Confirmed the default control is **All priorities** and the full request list is rendered on initial load. Automated view-state coverage confirms the full ordered list is preserved for **All priorities**.
+- **AC2 — Pass:** Selecting **High** displays only High-priority requests. Automated tests cover the filtered result and filtered request count.
 - **AC3 — Pass:** Selecting **Normal** displays only Normal-priority requests.
 - **AC4 — Pass:** Selecting **Low** displays only Low-priority requests.
-- **AC5 — Pass:** When a selected priority has no matches, the table is hidden and the **No matching requests** message is shown.
+- **AC5 — Pass:** When a selected priority has no matches, the table is hidden and the **No matching requests** message is shown. Automated view-state coverage now verifies the required no-matches state and message.
 - **AC6 — Pass:** Automated tests confirm legacy requests without a Priority field are preserved and remain available under **All priorities**.
 - **AC7 — Pass:** Automated tests confirm filtering returns a separate view without mutating or reordering the original request list; returning to **All priorities** restores the full order.
 - **AC8 — Pass:** Existing request creation tests continue to pass for default Normal priority, selected priority, validation, save/load behavior, and legacy data.
 
 ### Test Summary
 
-- `npm test`: **10 passed, 0 failed**.
-- Browser verification: confirmed High, Normal, Low, and All-priority views update correctly and the filtered request count reflects the visible results.
+- `npm test`: **14 passed, 0 failed**.
+- Automated coverage now includes the priority-filter view state for the full list, filtered counts, no-match handling, and the original empty-list state.
+- Browser verification remains appropriate for confirming the actual select control and table visibility in the rendered page.
