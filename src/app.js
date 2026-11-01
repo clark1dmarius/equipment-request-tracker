@@ -2,10 +2,10 @@ import {
   RequestValidationError,
   appendRequest,
   createRequest,
-  filterRequestsByPriority,
   loadRequests,
   saveRequests,
 } from "./request-store.js";
+import { getPriorityFilterView } from "./priority-filter-view.js";
 
 const form = document.querySelector("#request-form");
 const message = document.querySelector("#form-message");
@@ -54,29 +54,18 @@ form.addEventListener("submit", (event) => {
 });
 
 function renderRequests() {
-  const selectedPriority = priorityFilter.value;
-  const visibleRequests = filterRequestsByPriority(requests, selectedPriority);
-  const hasRequests = requests.length > 0;
-  const hasVisibleRequests = visibleRequests.length > 0;
+  const view = getPriorityFilterView(requests, priorityFilter.value);
 
-  if (selectedPriority === "All") {
-    count.textContent = `${requests.length} ${requests.length === 1 ? "request" : "requests"}`;
-  } else {
-    count.textContent = `${visibleRequests.length} of ${requests.length} requests`;
+  count.textContent = view.countText;
+  emptyState.hidden = view.hasVisibleRequests;
+  tableWrapper.hidden = !view.hasVisibleRequests;
+
+  if (!view.hasVisibleRequests) {
+    emptyStateTitle.textContent = view.emptyStateTitle;
+    emptyStateMessage.textContent = view.emptyStateMessage;
   }
 
-  emptyState.hidden = hasVisibleRequests;
-  tableWrapper.hidden = !hasVisibleRequests;
-
-  if (!hasRequests) {
-    emptyStateTitle.textContent = "No requests yet";
-    emptyStateMessage.textContent = "Add the first equipment request using the form.";
-  } else if (!hasVisibleRequests) {
-    emptyStateTitle.textContent = "No matching requests";
-    emptyStateMessage.textContent = `No ${selectedPriority.toLowerCase()} priority requests are currently available.`;
-  }
-
-  tableBody.replaceChildren(...visibleRequests.map(createRequestRow));
+  tableBody.replaceChildren(...view.visibleRequests.map(createRequestRow));
 }
 
 function createRequestRow(request) {
